@@ -23,18 +23,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        seekBarSensitive = findViewById(R.id.seekBarSensitive);
-//        threshold = seekBarSensitive.getProgress();
-
-        SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        sensorManager.registerListener(this,sensorManager.getDefaultSensor(
-                Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_NORMAL);
-
         textViewSteps = findViewById(R.id.textViewSteps);
         textViewGx = findViewById(R.id.textViewGx);
         textViewGy = findViewById(R.id.textViewGy);
         textViewGz = findViewById(R.id.textViewGz);
+
+        seekBarSensitive = findViewById(R.id.seekBarSensitive);
+        seekBarSensitive.setMax(10);
+        seekBarSensitive.setProgress(threshold);
+        seekBarSensitive.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                threshold = progress;
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+
+        SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this,sensorManager.getDefaultSensor(
+                Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_NORMAL);
 
         ((Button)findViewById(R.id.buttonReset)).setOnClickListener(this);
 
@@ -49,11 +62,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(Math.abs(currentY-previousY)>threshold){
             steps++;
             textViewSteps.setText(String.valueOf(steps));
-
-        }textViewGx.setText(String.valueOf(x));
+        }
+        textViewGx.setText(String.valueOf(x));
         textViewGy.setText(String.valueOf(y));
         textViewGz.setText(String.valueOf(z));
-        previousY = y;
+        previousY = currentY;
 
     }
 
@@ -65,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onClick(View v) {
-        textViewSteps.setText("");
-        steps = 0;
+        textViewSteps.setText("0");
+        threshold = 3;
+        seekBarSensitive.setProgress(threshold);
+
     }
 }
